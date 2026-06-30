@@ -1,381 +1,841 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bible Journey</title>
-    <style>
-        /* Base styles to match the React app environment */
-        body, html {
-            margin: 0;
-            padding: 0;
-            background-color: #0F0D0A;
-            color: #E8E0D0;
-            font-family: 'Georgia', serif;
-            -webkit-font-smoothing: antialiased;
-        }
-        
-        * {
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Bible Journey" />
+  <title>Bible Journey</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        button {
-            -webkit-tap-highlight-color: transparent;
-        }
+    :root {
+      --bg:        #0F0D0A;
+      --surface:   #1A1612;
+      --surface2:  #12100E;
+      --border:    #2A2418;
+      --text:      #F0E8D8;
+      --muted:     #9A8A72;
+      --faint:     #5A4A32;
+      --gold:      #C8A96E;
+      --green:     #6B9E6B;
+      --blue:      #7B8EC8;
+      --red:       #C87B7B;
+    }
 
-        /* Smooth out button hovers just a bit */
-        button:hover {
-            opacity: 0.95;
-        }
-    </style>
+    body {
+      font-family: Georgia, 'Times New Roman', serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    /* ── HEADER ── */
+    #header {
+      background: linear-gradient(180deg, #1A1410 0%, #0F0D0A 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 1.5rem 1.5rem;
+      text-align: center;
+    }
+    #header .eyebrow {
+      font-family: sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+    }
+    #header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+    }
+    #header .tagline {
+      font-family: sans-serif;
+      font-size: 0.85rem;
+      color: #8A7A62;
+      margin-bottom: 1.25rem;
+    }
+    .progress-labels {
+      display: flex;
+      justify-content: space-between;
+      font-family: sans-serif;
+      font-size: 0.75rem;
+      color: #8A7A62;
+      margin-bottom: 0.4rem;
+      max-width: 320px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .progress-bar-wrap {
+      max-width: 320px;
+      margin: 0 auto;
+      height: 6px;
+      background: #1E1A12;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--gold);
+      border-radius: 3px;
+      transition: width 0.5s ease;
+      width: 0%;
+    }
+
+    /* ── VIEWS ── */
+    .view { display: none; padding: 1.5rem; }
+    .view.active { display: block; }
+
+    /* ── BACK BUTTON ── */
+    .back-btn {
+      background: none;
+      border: none;
+      color: var(--gold);
+      cursor: pointer;
+      font-family: sans-serif;
+      font-size: 0.9rem;
+      padding: 0;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    /* ── PASTORAL QUOTE ── */
+    .quote-card {
+      background: #141008;
+      border: 1px solid #2A2010;
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    .quote-card p {
+      font-style: italic;
+      color: var(--muted);
+      line-height: 1.7;
+      font-family: sans-serif;
+      font-size: 0.88rem;
+    }
+    .quote-card .attribution {
+      margin-top: 0.75rem;
+      color: var(--gold);
+      font-size: 0.78rem;
+      font-family: sans-serif;
+      letter-spacing: 0.1em;
+    }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      color: var(--faint);
+      font-family: sans-serif;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    /* ── PHASE CARDS ── */
+    .phase-card {
+      width: 100%;
+      text-align: left;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.1rem;
+      cursor: pointer;
+      margin-bottom: 0.75rem;
+      display: block;
+      border-left-width: 4px;
+      border-left-style: solid;
+    }
+    .phase-card:hover { opacity: 0.85; }
+    .phase-card-top { display: flex; justify-content: space-between; align-items: flex-start; }
+    .phase-eyebrow {
+      font-size: 0.72rem;
+      font-family: sans-serif;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 0.15rem;
+    }
+    .phase-title { font-size: 1.1rem; color: var(--text); }
+    .phase-subtitle { font-size: 0.82rem; color: #7A6A52; font-family: sans-serif; margin-top: 0.1rem; }
+    .phase-count { font-size: 0.72rem; font-family: sans-serif; }
+    .phase-progress {
+      height: 3px;
+      background: #1E1A12;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 0.6rem;
+    }
+    .phase-progress-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.5s;
+    }
+
+    /* ── HABIT CARDS ── */
+    .habit-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.85rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 0.6rem;
+    }
+    .habit-icon { font-size: 1.2rem; flex-shrink: 0; }
+    .habit-title { color: #E8D8C0; font-family: sans-serif; font-weight: 600; font-size: 0.88rem; }
+    .habit-desc { color: #6A5A42; font-family: sans-serif; font-size: 0.78rem; margin-top: 0.1rem; line-height: 1.5; }
+
+    /* ── PHASE DETAIL ── */
+    .phase-detail-header { margin-bottom: 1.5rem; }
+    .phase-detail-icon-row { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.5rem; }
+    .phase-detail-icon { font-size: 2rem; }
+    .phase-detail-meta { }
+    .phase-detail-eyebrow { font-size: 0.72rem; font-family: sans-serif; letter-spacing: 0.2em; text-transform: uppercase; }
+    .phase-detail-title { font-size: 1.4rem; margin-top: 0.1rem; }
+    .phase-detail-desc { font-family: sans-serif; color: var(--muted); line-height: 1.6; font-size: 0.88rem; margin-bottom: 1rem; }
+    .scripture-block {
+      border-left-width: 3px;
+      border-left-style: solid;
+      padding: 1rem;
+      border-radius: 0 8px 8px 0;
+      background: var(--surface);
+      margin-bottom: 1.5rem;
+    }
+    .scripture-text { font-style: italic; color: #C8C0B0; font-family: sans-serif; font-size: 0.85rem; line-height: 1.6; }
+
+    /* ── LESSON CARDS ── */
+    .lesson-card {
+      width: 100%;
+      text-align: left;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    .lesson-card:hover { opacity: 0.85; }
+    .lesson-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 0.72rem;
+      font-family: sans-serif;
+      font-weight: 700;
+    }
+    .lesson-name { color: var(--text); font-family: sans-serif; font-weight: 600; font-size: 0.9rem; }
+    .lesson-focus { color: #6A5A42; font-family: sans-serif; font-size: 0.78rem; margin-top: 0.1rem; }
+    .lesson-arrow { color: #3A3020; font-size: 1rem; margin-left: auto; }
+
+    /* ── LESSON DETAIL ── */
+    .lesson-detail-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+    .lesson-eyebrow { font-size: 0.72rem; letter-spacing: 0.15em; font-family: sans-serif; text-transform: uppercase; margin-bottom: 0.3rem; }
+    .lesson-title { font-size: 1.4rem; margin-bottom: 0.3rem; }
+    .lesson-subtitle { font-style: italic; font-family: sans-serif; color: var(--muted); font-size: 0.88rem; margin-bottom: 1.5rem; }
+    .info-block {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+    }
+    .info-block-label { font-size: 0.7rem; letter-spacing: 0.12em; font-family: sans-serif; text-transform: uppercase; margin-bottom: 0.6rem; }
+    .info-block ul { padding-left: 1.2rem; font-family: sans-serif; line-height: 2; }
+    .info-block li { color: #C8C0B0; font-size: 0.88rem; }
+    .info-block p { font-family: sans-serif; color: #C8C0B0; line-height: 1.6; font-size: 0.88rem; }
+    .info-block p.italic { font-style: italic; }
+    .key-verse-block {
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+      margin-bottom: 0.75rem;
+    }
+    .key-verse-label { font-size: 0.72rem; letter-spacing: 0.15em; font-family: sans-serif; text-transform: uppercase; margin-bottom: 0.3rem; }
+    .key-verse-ref { font-size: 1.05rem; color: var(--text); }
+    .complete-btn {
+      width: 100%;
+      margin-top: 1.5rem;
+      padding: 0.9rem;
+      border-radius: 8px;
+      border: none;
+      font-family: sans-serif;
+      font-weight: 700;
+      font-size: 0.92rem;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    /* ── FOOTER ── */
+    .footer-verse {
+      text-align: center;
+      padding: 1rem 0;
+      border-top: 1px solid #1E1A12;
+      margin-top: 0.5rem;
+    }
+    .footer-verse p { color: var(--faint); font-family: sans-serif; font-size: 0.78rem; line-height: 1.6; }
+
+    /* ── BOTTOM TAB NAV ── */
+    #tabbar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      background: #14110D;
+      border-top: 1px solid var(--border);
+      padding-bottom: env(safe-area-inset-bottom);
+      z-index: 100;
+    }
+    .tab-btn {
+      flex: 1;
+      background: none;
+      border: none;
+      color: var(--faint);
+      font-family: sans-serif;
+      font-size: 0.7rem;
+      padding: 0.6rem 0.4rem 0.55rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.2rem;
+      letter-spacing: 0.02em;
+    }
+    .tab-btn .tab-icon { font-size: 1.2rem; line-height: 1; }
+    .tab-btn.active { color: var(--gold); }
+    body { padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
+
+    /* ── DAILY READING TAB ── */
+    .plan-intro {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 1.25rem;
+    }
+    .plan-intro p { font-family: sans-serif; color: var(--muted); font-size: 0.85rem; line-height: 1.6; }
+    .stage-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin: 1.5rem 0 0.6rem;
+    }
+    .stage-header:first-of-type { margin-top: 0; }
+    .stage-title { font-size: 1rem; color: var(--text); }
+    .stage-range { font-size: 0.72rem; color: var(--faint); font-family: sans-serif; }
+    .stage-why { font-family: sans-serif; color: var(--muted); font-size: 0.8rem; line-height: 1.5; margin-bottom: 0.7rem; }
+    .day-row {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.7rem 0.85rem;
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+    }
+    .day-check {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 1.5px solid #3A3020;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      font-family: sans-serif;
+      color: transparent;
+    }
+    .day-check.checked {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: #0F0D0A;
+    }
+    .day-reading { font-family: sans-serif; color: #D8C8A8; font-size: 0.88rem; flex: 1; }
+    .day-row.done .day-reading { color: #6A5A42; text-decoration: line-through; }
+    .reading-progress-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .reading-progress-text { font-family: sans-serif; font-size: 0.78rem; color: var(--muted); }
+    .reset-link { font-family: sans-serif; font-size: 0.72rem; color: #6A5A42; background: none; border: none; cursor: pointer; text-decoration: underline; }
+  </style>
 </head>
 <body>
-    <div id="app"></div>
 
-    <script>
-        // --- DATA ---
-        const phases = [
-          {
-            id: 1,
-            title: "The Foundation",
-            subtitle: "Who Jesus Is",
-            duration: "Weeks 1–4",
-            color: "#C8A96E",
-            icon: "✝",
-            theme: "Identity & Salvation",
-            description: "Before we can build faith, we must know deeply who we believe in. This phase anchors your entire walk in the person of Jesus Christ.",
-            scripture: "John 1:1–14",
-            scriptureText: '"In the beginning was the Word, and the Word was with God, and the Word was God." — John 1:1',
-            lessons: [
-              { week: 1, title: "The Gospel of John", focus: "Who is Jesus?", readings: ["John 1–5"], practice: "Write down every name or title given to Jesus you find.", prayer: "Lord, reveal yourself to me as I read. Open my eyes.", keyVerse: "John 3:16" },
-              { week: 2, title: "The Gospels Side-by-Side", focus: "The Life & Ministry of Christ", readings: ["Matthew 5–7 (Sermon on the Mount)", "Luke 15 (Parables of the Lost)"], practice: "Journal: What kind of King is Jesus? How is He different from earthly leaders?", prayer: "Jesus, show me the kind of life you call me to.", keyVerse: "Matthew 6:33" },
-              { week: 3, title: "The Cross & Resurrection", focus: "Salvation & New Life", readings: ["Luke 22–24", "Romans 3:21–26", "Romans 5:1–11"], practice: "Meditate on what the cross cost. Write a personal prayer of thanksgiving.", prayer: "Father, help me never take the cross for granted.", keyVerse: "Romans 5:8" },
-              { week: 4, title: "Identity in Christ", focus: "Who You Are Because of Him", readings: ["Ephesians 1–2", "2 Corinthians 5:17", "Galatians 2:20"], practice: "Make a list: '10 things God says are true about me.' Read them aloud daily.", prayer: "Lord, let me see myself the way You see me.", keyVerse: "Ephesians 2:10" },
-            ],
-          },
-          {
-            id: 2,
-            title: "Faith That Grows",
-            subtitle: "Trusting God's Word",
-            duration: "Weeks 5–9",
-            color: "#6B9E6B",
-            icon: "🌱",
-            theme: "Trust & Faithfulness",
-            description: "Faith is not a feeling — it is a muscle. This phase trains you to trust God through His promises, through heroes of the faith, and through honest prayer.",
-            scripture: "Hebrews 11:1",
-            scriptureText: '"Now faith is the substance of things hoped for, the evidence of things not seen." — Hebrews 11:1',
-            lessons: [
-              { week: 5, title: "The Psalms", focus: "Honest Conversation with God", readings: ["Psalm 23", "Psalm 46", "Psalm 91", "Psalm 139"], practice: "Write your own psalm. Tell God exactly how you feel — raw and honest.", prayer: "God, I bring you my whole self today, not just the polished parts.", keyVerse: "Psalm 46:10" },
-              { week: 6, title: "Heroes of Faith", focus: "God Is Faithful Through Impossible Things", readings: ["Hebrews 11", "Genesis 22 (Abraham)", "Daniel 3 (The Fiery Furnace)"], practice: "Identify a 'fiery furnace' in your own life. Pray over it with Hebrews 11 open.", prayer: "Lord, grow my faith to trust you when I cannot see the way.", keyVerse: "Hebrews 11:6" },
-              { week: 7, title: "Proverbs & Wisdom", focus: "The Fear of the Lord", readings: ["Proverbs 1–4", "Proverbs 31", "James 1:5"], practice: "Read one chapter of Proverbs per day (there are 31 — one per day is a great habit).", prayer: "Father, give me wisdom that comes from above, not from the world.", keyVerse: "Proverbs 3:5–6" },
-              { week: 8, title: "The Promises of God", focus: "Standing on His Word", readings: ["Isaiah 40–41", "Jeremiah 29:11", "Joshua 1:1–9", "2 Peter 1:3–4"], practice: "Create a 'Promise Journal' — collect God's promises and date them when you claim them.", prayer: "Lord, I choose today to stand on Your Word, not my circumstances.", keyVerse: "Isaiah 40:31" },
-              { week: 9, title: "Prayer & Fasting", focus: "Deepening the Connection", readings: ["Matthew 6:5–18", "Luke 18:1–8", "Philippians 4:6–7"], practice: "Choose one day this week to fast a meal. Replace that time with prayer and Scripture.", prayer: "Lord, teach me to pray. Draw me into deeper communion with You.", keyVerse: "Philippians 4:7" },
-            ],
-          },
-          {
-            id: 3,
-            title: "Stewardship & Authority",
-            subtitle: "Ruling as God's Servant",
-            duration: "Weeks 10–15",
-            color: "#7B8EC8",
-            icon: "👑",
-            theme: "Dominion & Responsibility",
-            description: "In Genesis, God gave humanity authority over creation. This phase reclaims that purpose — handling money, time, relationships, and influence as a faithful steward under God.",
-            scripture: "Genesis 1:28",
-            scriptureText: '"God blessed them and said… have dominion over the fish of the sea, over the birds of the air, and over every living thing." — Genesis 1:28',
-            lessons: [
-              { week: 10, title: "The Original Commission", focus: "Made in God's Image to Steward", readings: ["Genesis 1–2", "Psalm 8", "Matthew 25:14–30 (Parable of the Talents)"], practice: "Inventory: What gifts, resources, and relationships has God entrusted to you?", prayer: "Lord, show me what You've placed in my hands. Let me honor it.", keyVerse: "Matthew 25:21" },
-              { week: 11, title: "Money & Generosity", focus: "God Owns It All", readings: ["Malachi 3:10", "Luke 12:13–21", "2 Corinthians 9:6–11", "1 Timothy 6:6–10"], practice: "Review your last 30 days of spending. Where does God show up in those numbers?", prayer: "Father, free me from the love of money. Let me hold it loosely.", keyVerse: "2 Corinthians 9:7" },
-              { week: 12, title: "Time & Work", focus: "The Sanctity of Vocation", readings: ["Colossians 3:23–24", "Ecclesiastes 9:10", "Genesis 2:15", "Exodus 20:8–11"], practice: "Map out your week. Where is God present? Where is He absent? Invite Him into both.", prayer: "Lord, let my work be worship. Make me excellent for Your glory.", keyVerse: "Colossians 3:23" },
-              { week: 13, title: "Authority Over Self", focus: "The Discipline of the Inner Life", readings: ["Galatians 5:16–25 (Fruit of the Spirit)", "Romans 12:1–2", "1 Corinthians 9:24–27"], practice: "Choose one habit to build and one to break this month. Make it a spiritual act.", prayer: "Holy Spirit, produce in me the fruit that only You can grow.", keyVerse: "Galatians 5:22–23" },
-              { week: 14, title: "Relationships & Influence", focus: "Loving as an Act of Authority", readings: ["John 13:34–35", "1 Corinthians 13", "Romans 12:9–21"], practice: "Identify someone hard to love. Do one intentional act of love toward them this week.", prayer: "Lord, love through me where I cannot love on my own.", keyVerse: "John 13:35" },
-              { week: 15, title: "Spiritual Authority", focus: "The Armor of God", readings: ["Ephesians 6:10–18", "Luke 10:19", "James 4:7", "1 Peter 5:8–9"], practice: "Put on the Armor of God verbally each morning this week. Speak it over yourself.", prayer: "Lord, I stand in Your authority today. No weapon formed against me shall prosper.", keyVerse: "Ephesians 6:10" },
-            ],
-          },
-          {
-            id: 4,
-            title: "Living It Out",
-            subtitle: "The Church, Mission & Eternity",
-            duration: "Weeks 16–20",
-            color: "#C87B7B",
-            icon: "🔥",
-            theme: "Community & Purpose",
-            description: "Faith is never meant to be private. This final phase calls you out into the body of Christ and into the world — to live as a light, serve as a leader, and fix your eyes on eternity.",
-            scripture: "Matthew 28:19",
-            scriptureText: '"Go therefore and make disciples of all nations, baptizing them in the name of the Father and of the Son and of the Holy Spirit." — Matthew 28:19',
-            lessons: [
-              { week: 16, title: "The Church", focus: "You Belong to a Body", readings: ["Acts 2:42–47", "1 Corinthians 12", "Hebrews 10:24–25"], practice: "Commit to one community: a local church, a small group, a prayer partner.", prayer: "Lord, connect me deeply with Your people. Help me give and receive.", keyVerse: "Hebrews 10:25" },
-              { week: 17, title: "Serving Others", focus: "Greatness Through Service", readings: ["Mark 10:42–45", "Philippians 2:1–11", "Matthew 25:31–46"], practice: "Serve anonymously this week. Give without receiving credit.", prayer: "Jesus, make me a servant like you — washing feet without shame.", keyVerse: "Mark 10:45" },
-              { week: 18, title: "Sharing Your Faith", focus: "Witness With Words and Life", readings: ["1 Peter 3:15", "Acts 1:8", "Romans 10:14–15"], practice: "Write your testimony in 3 minutes. Practice saying it simply and clearly.", prayer: "Lord, give me boldness and the right words at the right moment.", keyVerse: "1 Peter 3:15" },
-              { week: 19, title: "Suffering & Hope", focus: "Anchored in the Storm", readings: ["Romans 8:18–39", "Job 1–2, 42", "2 Corinthians 4:7–18"], practice: "Think of your hardest season. Write how God was present even when hidden.", prayer: "Father, nothing can separate me from Your love. I choose to believe that today.", keyVerse: "Romans 8:28" },
-              { week: 20, title: "The Return of Christ & Eternity", focus: "Living With Eyes on Heaven", readings: ["Revelation 21–22", "1 Thessalonians 4:13–18", "Colossians 3:1–4"], practice: "Spend 30 minutes imagining eternity with God. Let it reshape how you live today.", prayer: "Come, Lord Jesus. Until then, use me fully for Your kingdom.", keyVerse: "Revelation 21:5" },
-            ],
-          },
-        ];
+<!-- HEADER -->
+<div id="header">
+  <div class="eyebrow">A 20-Week Learning Journey</div>
+  <h1>Building Faith &<br>Walking in Authority</h1>
+  <p class="tagline">Rooted in Christ · Grounded in Scripture · Called to Steward</p>
+  <div class="progress-labels">
+    <span id="progress-label">0 of 20 lessons complete</span>
+    <span id="progress-pct">0%</span>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progress-fill"></div>
+  </div>
+</div>
 
-        const habits = [
-          { icon: "📖", title: "Daily Reading", desc: "5–15 min of Scripture every morning before your phone." },
-          { icon: "✍️", title: "Journaling", desc: "Write what God is saying to you through each passage." },
-          { icon: "🙏", title: "Prayer", desc: "Speak to God in your own words — praise, confession, requests." },
-          { icon: "👥", title: "Community", desc: "Share what you're learning with at least one other person." },
-          { icon: "📝", title: "Memorize", desc: "Learn one key verse per week. Scripture hidden in the heart changes the mind." },
-        ];
+<!-- HOME VIEW -->
+<div class="view active" id="view-home">
+  <div class="quote-card">
+    <p>"You do not need to know <em>more</em> about God as much as you need to <em>know</em> God — and to align your life with His Word. This journey is not a curriculum. It is a conversation with the living Christ."</p>
+    <div class="attribution">— Your Pastor</div>
+  </div>
 
-        // --- STATE ---
-        let activePhase = null;
-        let activeLesson = null;
-        let completed = {};
+  <div class="section-label">Your Four Phases</div>
+  <div id="phase-list"></div>
 
-        // --- ACTIONS ---
-        function setActivePhase(id) {
-            activePhase = id;
-            activeLesson = null;
-            render();
-            window.scrollTo(0, 0);
-        }
+  <div class="section-label" style="margin-top:1.5rem;">Daily Habits of a Disciple</div>
+  <div id="habit-list"></div>
 
-        function setActiveLesson(week) {
-            activeLesson = week;
-            render();
-            window.scrollTo(0, 0);
-        }
+  <div class="footer-verse">
+    <p>"For the word of God is alive and active."<br>— Hebrews 4:12</p>
+  </div>
+</div>
 
-        function toggleComplete(phaseId, weekNum) {
-            const key = `${phaseId}-${weekNum}`;
-            completed[key] = !completed[key];
-            render();
-        }
+<!-- PHASE DETAIL VIEW -->
+<div class="view" id="view-phase">
+  <button class="back-btn" onclick="showHome()">← Back to Journey</button>
+  <div id="phase-detail-content"></div>
+</div>
 
-        // --- RENDER FUNCTIONS ---
-        function renderSection(color, label, content) {
-            return `
-                <div style="background-color: #12100E; border: 1px solid #2A2418; border-radius: 8px; padding: 1rem;">
-                    <div style="font-size: 0.75rem; color: ${color}; letter-spacing: 0.12em; font-family: sans-serif; text-transform: uppercase; margin-bottom: 0.6rem;">${label}</div>
-                    ${content}
-                </div>
-            `;
-        }
+<!-- LESSON DETAIL VIEW -->
+<div class="view" id="view-lesson">
+  <button class="back-btn" id="lesson-back-btn">← Back</button>
+  <div id="lesson-detail-content"></div>
+</div>
 
-        function renderLessonView(phase, lesson) {
-            const isCompleted = completed[`${phase.id}-${lesson.week}`];
-            const btnBg = isCompleted ? "#2A4A2A" : phase.color;
-            const btnColor = isCompleted ? "#6BCC6B" : "#0F0D0A";
-            const btnText = isCompleted ? "✓ Completed" : "Mark Week Complete";
+<!-- DAILY READING VIEW -->
+<div class="view" id="view-reading">
+  <div class="plan-intro">
+    <p>A simple place to start, day by day. This plan is independent of your 20-week journey — use it as your steady daily habit. Start with Jesus, then move through the story of the early church, the letters, and the foundations of the Old Testament.</p>
+  </div>
+  <div class="reading-progress-row">
+    <span class="reading-progress-text" id="reading-progress-text">0 of 0 days read</span>
+    <button class="reset-link" onclick="resetReadingPlan()">Reset</button>
+  </div>
+  <div id="reading-plan-list"></div>
+</div>
 
-            const readingsHtml = lesson.readings.map(r => `<li style="color: #C8C0B0;">${r}</li>`).join('');
+<!-- TAB BAR -->
+<div id="tabbar">
+  <button class="tab-btn active" id="tab-journey" onclick="switchTab('journey')">
+    <span class="tab-icon">📜</span>
+    <span>Journey</span>
+  </button>
+  <button class="tab-btn" id="tab-reading" onclick="switchTab('reading')">
+    <span class="tab-icon">📖</span>
+    <span>Daily Reading</span>
+  </button>
+</div>
 
-            return `
-                <div style="padding: 1.5rem;">
-                    <button onclick="setActiveLesson(null)" style="background: none; border: none; color: #C8A96E; cursor: pointer; font-size: 0.9rem; font-family: sans-serif; margin-bottom: 1rem; padding: 0;">
-                        ← Back to ${phase.title}
-                    </button>
-                    <div style="background-color: #1A1612; border-radius: 12px; padding: 1.5rem; border: 1px solid ${phase.color}33;">
-                        <div style="font-size: 0.8rem; color: ${phase.color}; letter-spacing: 0.15em; font-family: sans-serif; text-transform: uppercase; margin-bottom: 0.3rem;">
-                            Week ${lesson.week}
-                        </div>
-                        <h2 style="font-size: 1.5rem; margin: 0 0 0.3rem;">${lesson.title}</h2>
-                        <p style="color: #8A7A62; margin: 0 0 1.5rem; font-family: sans-serif; font-style: italic;">${lesson.focus}</p>
+<script>
+const phases = [
+  {
+    id: 1, title: "The Foundation", subtitle: "Who Jesus Is",
+    duration: "Weeks 1–4", color: "#C8A96E", icon: "✝", theme: "Identity & Salvation",
+    description: "Before we can build on anything, we must know deeply who we believe in. This phase anchors your entire walk in the person of Jesus Christ.",
+    scripture: "John 1:1–14",
+    scriptureText: '"In the beginning was the Word, and the Word was with God, and the Word was God." — John 1:1',
+    lessons: [
+      { week: 1, title: "The Gospel of John", focus: "Who is Jesus?", readings: ["John 1–5"], practice: "Write down every name or title given to Jesus you find.", prayer: "Lord, reveal yourself to me as I read. Open my eyes.", keyVerse: "John 3:16" },
+      { week: 2, title: "The Gospels Side-by-Side", focus: "The Life & Ministry of Christ", readings: ["Matthew 5–7 (Sermon on the Mount)", "Luke 15 (Parables of the Lost)"], practice: "Journal: What kind of King is Jesus? How is He different from earthly leaders?", prayer: "Jesus, show me the kind of life you call me to.", keyVerse: "Matthew 6:33" },
+      { week: 3, title: "The Cross & Resurrection", focus: "Salvation & New Life", readings: ["Luke 22–24", "Romans 3:21–26", "Romans 5:1–11"], practice: "Meditate on what the cross cost. Write a personal prayer of thanksgiving.", prayer: "Father, help me never take the cross for granted.", keyVerse: "Romans 5:8" },
+      { week: 4, title: "Identity in Christ", focus: "Who You Are Because of Him", readings: ["Ephesians 1–2", "2 Corinthians 5:17", "Galatians 2:20"], practice: "Make a list: '10 things God says are true about me.' Read them aloud daily.", prayer: "Lord, let me see myself the way You see me.", keyVerse: "Ephesians 2:10" }
+    ]
+  },
+  {
+    id: 2, title: "Faith That Grows", subtitle: "Trusting God's Word",
+    duration: "Weeks 5–9", color: "#6B9E6B", icon: "🌱", theme: "Trust & Faithfulness",
+    description: "Faith is not a feeling — it is a muscle. This phase trains you to trust God through His promises, through heroes of the faith, and through honest prayer.",
+    scripture: "Hebrews 11:1",
+    scriptureText: '"Now faith is the substance of things hoped for, the evidence of things not seen." — Hebrews 11:1',
+    lessons: [
+      { week: 5, title: "The Psalms", focus: "Honest Conversation with God", readings: ["Psalm 23", "Psalm 46", "Psalm 91", "Psalm 139"], practice: "Write your own psalm. Tell God exactly how you feel — raw and honest.", prayer: "God, I bring you my whole self today, not just the polished parts.", keyVerse: "Psalm 46:10" },
+      { week: 6, title: "Heroes of Faith", focus: "God Is Faithful Through Impossible Things", readings: ["Hebrews 11", "Genesis 22 (Abraham)", "Daniel 3 (The Fiery Furnace)"], practice: "Identify a 'fiery furnace' in your own life. Pray over it with Hebrews 11 open.", prayer: "Lord, grow my faith to trust you when I cannot see the way.", keyVerse: "Hebrews 11:6" },
+      { week: 7, title: "Proverbs & Wisdom", focus: "The Fear of the Lord", readings: ["Proverbs 1–4", "Proverbs 31", "James 1:5"], practice: "Read one chapter of Proverbs per day (there are 31 — one per day is a great habit).", prayer: "Father, give me wisdom that comes from above, not from the world.", keyVerse: "Proverbs 3:5–6" },
+      { week: 8, title: "The Promises of God", focus: "Standing on His Word", readings: ["Isaiah 40–41", "Jeremiah 29:11", "Joshua 1:1–9", "2 Peter 1:3–4"], practice: "Create a 'Promise Journal' — collect God's promises and date them when you claim them.", prayer: "Lord, I choose today to stand on Your Word, not my circumstances.", keyVerse: "Isaiah 40:31" },
+      { week: 9, title: "Prayer & Fasting", focus: "Deepening the Connection", readings: ["Matthew 6:5–18", "Luke 18:1–8", "Philippians 4:6–7"], practice: "Choose one day this week to fast a meal. Replace that time with prayer and Scripture.", prayer: "Lord, teach me to pray. Draw me into deeper communion with You.", keyVerse: "Philippians 4:7" }
+    ]
+  },
+  {
+    id: 3, title: "Stewardship & Authority", subtitle: "Ruling as God's Servant",
+    duration: "Weeks 10–15", color: "#7B8EC8", icon: "👑", theme: "Dominion & Responsibility",
+    description: "In Genesis, God gave humanity authority over creation. This phase reclaims that purpose — handling money, time, relationships, and influence as a faithful steward under God.",
+    scripture: "Genesis 1:28",
+    scriptureText: '"God blessed them and said… have dominion over the fish of the sea, over the birds of the air, and over every living thing." — Genesis 1:28',
+    lessons: [
+      { week: 10, title: "The Original Commission", focus: "Made in God's Image to Steward", readings: ["Genesis 1–2", "Psalm 8", "Matthew 25:14–30 (Parable of the Talents)"], practice: "Inventory: What gifts, resources, and relationships has God entrusted to you?", prayer: "Lord, show me what You've placed in my hands. Let me honor it.", keyVerse: "Matthew 25:21" },
+      { week: 11, title: "Money & Generosity", focus: "God Owns It All", readings: ["Malachi 3:10", "Luke 12:13–21", "2 Corinthians 9:6–11", "1 Timothy 6:6–10"], practice: "Review your last 30 days of spending. Where does God show up in those numbers?", prayer: "Father, free me from the love of money. Let me hold it loosely.", keyVerse: "2 Corinthians 9:7" },
+      { week: 12, title: "Time & Work", focus: "The Sanctity of Vocation", readings: ["Colossians 3:23–24", "Ecclesiastes 9:10", "Genesis 2:15", "Exodus 20:8–11"], practice: "Map out your week. Where is God present? Where is He absent? Invite Him into both.", prayer: "Lord, let my work be worship. Make me excellent for Your glory.", keyVerse: "Colossians 3:23" },
+      { week: 13, title: "Authority Over Self", focus: "The Discipline of the Inner Life", readings: ["Galatians 5:16–25 (Fruit of the Spirit)", "Romans 12:1–2", "1 Corinthians 9:24–27"], practice: "Choose one habit to build and one to break this month. Make it a spiritual act.", prayer: "Holy Spirit, produce in me the fruit that only You can grow.", keyVerse: "Galatians 5:22–23" },
+      { week: 14, title: "Relationships & Influence", focus: "Loving as an Act of Authority", readings: ["John 13:34–35", "1 Corinthians 13", "Romans 12:9–21"], practice: "Identify someone hard to love. Do one intentional act of love toward them this week.", prayer: "Lord, love through me where I cannot love on my own.", keyVerse: "John 13:35" },
+      { week: 15, title: "Spiritual Authority", focus: "The Armor of God", readings: ["Ephesians 6:10–18", "Luke 10:19", "James 4:7", "1 Peter 5:8–9"], practice: "Put on the Armor of God verbally each morning this week. Speak it over yourself.", prayer: "Lord, I stand in Your authority today. No weapon formed against me shall prosper.", keyVerse: "Ephesians 6:10" }
+    ]
+  },
+  {
+    id: 4, title: "Living It Out", subtitle: "The Church, Mission & Eternity",
+    duration: "Weeks 16–20", color: "#C87B7B", icon: "🔥", theme: "Community & Purpose",
+    description: "Faith is never meant to be private. This final phase calls you out into the body of Christ and into the world — to live as a light, serve as a leader, and fix your eyes on eternity.",
+    scripture: "Matthew 28:19",
+    scriptureText: '"Go therefore and make disciples of all nations, baptizing them in the name of the Father and of the Son and of the Holy Spirit." — Matthew 28:19',
+    lessons: [
+      { week: 16, title: "The Church", focus: "You Belong to a Body", readings: ["Acts 2:42–47", "1 Corinthians 12", "Hebrews 10:24–25"], practice: "Commit to one community: a local church, a small group, a prayer partner.", prayer: "Lord, connect me deeply with Your people. Help me give and receive.", keyVerse: "Hebrews 10:25" },
+      { week: 17, title: "Serving Others", focus: "Greatness Through Service", readings: ["Mark 10:42–45", "Philippians 2:1–11", "Matthew 25:31–46"], practice: "Serve anonymously this week. Give without receiving credit.", prayer: "Jesus, make me a servant like you — washing feet without shame.", keyVerse: "Mark 10:45" },
+      { week: 18, title: "Sharing Your Faith", focus: "Witness With Words and Life", readings: ["1 Peter 3:15", "Acts 1:8", "Romans 10:14–15"], practice: "Write your testimony in 3 minutes. Practice saying it simply and clearly.", prayer: "Lord, give me boldness and the right words at the right moment.", keyVerse: "1 Peter 3:15" },
+      { week: 19, title: "Suffering & Hope", focus: "Anchored in the Storm", readings: ["Romans 8:18–39", "Job 1–2, 42", "2 Corinthians 4:7–18"], practice: "Think of your hardest season. Write how God was present even when hidden.", prayer: "Father, nothing can separate me from Your love. I choose to believe that today.", keyVerse: "Romans 8:28" },
+      { week: 20, title: "The Return of Christ & Eternity", focus: "Living With Eyes on Heaven", readings: ["Revelation 21–22", "1 Thessalonians 4:13–18", "Colossians 3:1–4"], practice: "Spend 30 minutes imagining eternity with God. Let it reshape how you live today.", prayer: "Come, Lord Jesus. Until then, use me fully for Your kingdom.", keyVerse: "Revelation 21:5" }
+    ]
+  }
+];
 
-                        <div style="display: grid; gap: 1rem;">
-                            ${renderSection(phase.color, "📖 This Week's Readings", `
-                                <ul style="margin: 0; padding-left: 1.2rem; font-family: sans-serif; line-height: 2;">
-                                    ${readingsHtml}
-                                </ul>
-                            `)}
+const habits = [
+  { icon: "📖", title: "Daily Reading", desc: "5–15 min of Scripture every morning before your phone." },
+  { icon: "✍️", title: "Journaling", desc: "Write what God is saying to you through each passage." },
+  { icon: "🙏", title: "Prayer", desc: "Speak to God in your own words — praise, confession, requests." },
+  { icon: "👥", title: "Community", desc: "Share what you're learning with at least one other person." },
+  { icon: "📝", title: "Memorize", desc: "Learn one key verse per week. Scripture hidden in the heart changes the mind." }
+];
 
-                            ${renderSection(phase.color, "✍️ Practice", `
-                                <p style="margin: 0; font-family: sans-serif; color: #C8C0B0; line-height: 1.6;">${lesson.practice}</p>
-                            `)}
+// ── DAILY READING PLAN ──
+// Beginner-friendly order: Gospels first, then Psalms woven in, then Acts,
+// then Paul's letters, then Old Testament foundations.
+const readingStages = [
+  {
+    title: "Stage 1 — Meet Jesus",
+    range: "Days 1–28",
+    why: "Start with the Gospel of John — written specifically so you would believe. Then Mark, the fastest-moving account of Jesus' life.",
+    days: [
+      "John 1", "John 2", "John 3", "John 4", "John 5", "John 6", "John 7",
+      "John 8", "John 9", "John 10", "John 11", "John 12", "John 13", "John 14",
+      "John 15", "John 16", "John 17", "John 18", "John 19", "John 20", "John 21",
+      "Mark 1", "Mark 2–3", "Mark 4–5", "Mark 6–7", "Mark 8–9", "Mark 10–11", "Mark 12–13"
+    ]
+  },
+  {
+    title: "Stage 2 — The Heart of Worship",
+    range: "Days 29–43",
+    why: "A two-week pause in the Psalms. These are honest prayers — praise, fear, doubt, and trust — that teach you how to talk to God.",
+    days: [
+      "Psalm 1", "Psalm 8", "Psalm 19", "Psalm 23", "Psalm 27", "Psalm 34",
+      "Psalm 42", "Psalm 46", "Psalm 51", "Psalm 63", "Psalm 91", "Psalm 100",
+      "Psalm 103", "Psalm 121", "Psalm 139"
+    ]
+  },
+  {
+    title: "Stage 3 — The Church Is Born",
+    range: "Days 44–58",
+    why: "Acts tells the true story of what happened after the resurrection — ordinary people carrying the gospel with boldness.",
+    days: [
+      "Acts 1", "Acts 2", "Acts 3–4", "Acts 5–6", "Acts 7", "Acts 8", "Acts 9",
+      "Acts 10–11", "Acts 12", "Acts 13–14", "Acts 15", "Acts 16", "Acts 17",
+      "Acts 18–19", "Acts 20–21"
+    ]
+  },
+  {
+    title: "Stage 4 — Letters That Build Faith",
+    range: "Days 59–78",
+    why: "Paul's letters explain what the gospel means for everyday life — grace, freedom, identity, and how to live as the church.",
+    days: [
+      "Romans 1–2", "Romans 3–4", "Romans 5–6", "Romans 7–8", "Romans 12",
+      "Galatians 1–2", "Galatians 3–4", "Galatians 5–6",
+      "Ephesians 1–2", "Ephesians 3–4", "Ephesians 5–6",
+      "Philippians 1–2", "Philippians 3–4",
+      "Colossians 1–2", "Colossians 3–4",
+      "1 Thessalonians 1–3", "1 Thessalonians 4–5",
+      "James 1–2", "James 3–5",
+      "1 Peter 1–5"
+    ]
+  },
+  {
+    title: "Stage 5 — Where It All Began",
+    range: "Days 79–100",
+    why: "Now that you know the gospel, return to Genesis and Exodus to see the foundations — creation, the fall, the promise, and the rescue God planned from the start.",
+    days: [
+      "Genesis 1–2", "Genesis 3", "Genesis 6–9", "Genesis 12", "Genesis 15",
+      "Genesis 22", "Genesis 37", "Genesis 39–41", "Genesis 45",
+      "Exodus 1–2", "Exodus 3", "Exodus 12", "Exodus 14", "Exodus 20",
+      "Joshua 1", "Joshua 6", "Judges 6–7", "Ruth 1–4",
+      "1 Samuel 16–17", "1 Samuel 24", "2 Samuel 7", "Daniel 3"
+    ]
+  }
+];
 
-                            ${renderSection(phase.color, "🙏 Prayer Focus", `
-                                <p style="margin: 0; font-family: sans-serif; color: #C8C0B0; line-height: 1.6; font-style: italic;">"${lesson.prayer}"</p>
-                            `)}
+const totalReadingDays = readingStages.reduce((a, s) => a + s.days.length, 0);
 
-                            <div style="background-color: #12100E; border: 1px solid ${phase.color}; border-radius: 8px; padding: 1rem; text-align: center;">
-                                <div style="font-size: 0.75rem; color: ${phase.color}; letter-spacing: 0.15em; font-family: sans-serif; text-transform: uppercase; margin-bottom: 0.3rem;">Key Verse</div>
-                                <p style="margin: 0; font-size: 1.1rem; color: #F0E8D8;">${lesson.keyVerse}</p>
-                            </div>
-                        </div>
 
-                        <button onclick="toggleComplete(${phase.id}, ${lesson.week})" style="width: 100%; margin-top: 1.5rem; padding: 0.9rem; border-radius: 8px; border: none; background-color: ${btnBg}; color: ${btnColor}; font-family: sans-serif; font-weight: 700; font-size: 0.95rem; cursor: pointer; letter-spacing: 0.05em; transition: background-color 0.2s, color 0.2s;">
-                            ${btnText}
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
+// ── STATE ──
+let completed = JSON.parse(localStorage.getItem('bj-completed') || '{}');
+let readingDone = JSON.parse(localStorage.getItem('bj-reading-done') || '{}');
+let currentPhaseId = null;
+let currentWeek = null;
+let activeTab = 'journey';
 
-        function renderPhaseView(phase) {
-            const lessonsHtml = phase.lessons.map(l => {
-                const done = completed[`${phase.id}-${l.week}`];
-                const borderColor = done ? phase.color + '88' : '#2A2418';
-                const iconBg = done ? phase.color : '#2A2418';
-                const iconColor = done ? '#0F0D0A' : '#6A5A42';
-                const iconText = done ? '✓' : l.week;
-                
-                return `
-                    <button onclick="setActiveLesson(${l.week})" style="width: 100%; text-align: left; background-color: #1A1612; border: 1px solid ${borderColor}; border-radius: 10px; padding: 1rem; cursor: pointer; display: flex; align-items: center; gap: 0.75rem; transition: border-color 0.2s;">
-                        <div style="width: 28px; height: 28px; border-radius: 50%; background-color: ${iconBg}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                            <span style="font-size: 0.75rem; color: ${iconColor}; font-family: sans-serif; font-weight: 700;">${iconText}</span>
-                        </div>
-                        <div style="flex: 1;">
-                            <div style="color: #F0E8D8; font-family: sans-serif; font-weight: 600; font-size: 0.95rem;">${l.title}</div>
-                            <div style="color: #6A5A42; font-family: sans-serif; font-size: 0.8rem; margin-top: 0.1rem;">${l.focus}</div>
-                        </div>
-                        <span style="color: #3A3020; font-size: 1rem;">›</span>
-                    </button>
-                `;
-            }).join('');
+function saveCompleted() {
+  localStorage.setItem('bj-completed', JSON.stringify(completed));
+}
 
-            return `
-                <div style="padding: 1.5rem;">
-                    <button onclick="setActivePhase(null)" style="background: none; border: none; color: #C8A96E; cursor: pointer; font-size: 0.9rem; font-family: sans-serif; margin-bottom: 1rem; padding: 0;">
-                        ← Back to Journey
-                    </button>
-                    <div style="margin-bottom: 1.5rem;">
-                        <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.5rem;">
-                            <span style="font-size: 2rem;">${phase.icon}</span>
-                            <div>
-                                <div style="font-size: 0.75rem; color: ${phase.color}; letter-spacing: 0.2em; font-family: sans-serif; text-transform: uppercase;">${phase.duration} · ${phase.theme}</div>
-                                <h2 style="margin: 0.1rem 0 0; font-size: 1.5rem;">${phase.title}</h2>
-                            </div>
-                        </div>
-                        <p style="font-family: sans-serif; color: #9A8A72; line-height: 1.6; margin: 0 0 1rem;">${phase.description}</p>
-                        <div style="background-color: #1A1612; border-left: 3px solid ${phase.color}; padding: 1rem; border-radius: 0 8px 8px 0;">
-                            <p style="margin: 0; font-style: italic; color: #C8C0B0; font-family: sans-serif; font-size: 0.9rem; line-height: 1.6;">${phase.scriptureText}</p>
-                        </div>
-                    </div>
+function saveReadingDone() {
+  localStorage.setItem('bj-reading-done', JSON.stringify(readingDone));
+}
 
-                    <h3 style="font-size: 1rem; letter-spacing: 0.1em; color: #6A5A42; font-family: sans-serif; text-transform: uppercase; margin-bottom: 0.75rem;">Weekly Lessons</h3>
-                    <div style="display: grid; gap: 0.75rem;">
-                        ${lessonsHtml}
-                    </div>
-                </div>
-            `;
-        }
+function totalComplete() {
+  return Object.values(completed).filter(Boolean).length;
+}
 
-        function renderHomeView() {
-            const phasesHtml = phases.map(p => {
-                const phaseDone = p.lessons.filter(l => completed[`${p.id}-${l.week}`]).length;
-                const progressPct = (phaseDone / p.lessons.length) * 100;
-                const counterColor = phaseDone === p.lessons.length ? p.color : '#5A4A32';
+// ── PROGRESS ──
+function updateProgress() {
+  const done = totalComplete();
+  const total = phases.reduce((a, p) => a + p.lessons.length, 0);
+  const pct = Math.round((done / total) * 100);
+  document.getElementById('progress-label').textContent = `${done} of ${total} lessons complete`;
+  document.getElementById('progress-pct').textContent = `${pct}%`;
+  document.getElementById('progress-fill').style.width = `${pct}%`;
+}
 
-                return `
-                    <button onclick="setActivePhase(${p.id})" style="text-align: left; background-color: #1A1612; border: 1px solid #2A2418; border-left: 4px solid ${p.color}; border-radius: 10px; padding: 1.1rem; cursor: pointer; display: grid; gap: 0.5rem; transition: background 0.2s;">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                            <div>
-                                <div style="font-size: 0.75rem; color: ${p.color}; font-family: sans-serif; letter-spacing: 0.15em; text-transform: uppercase;">${p.duration}</div>
-                                <div style="font-size: 1.15rem; color: #F0E8D8; margin-top: 0.15rem;">
-                                    <span style="margin-right: 0.4rem;">${p.icon}</span>${p.title}
-                                </div>
-                                <div style="font-size: 0.85rem; color: #7A6A52; font-family: sans-serif; margin-top: 0.1rem;">${p.subtitle}</div>
-                            </div>
-                            <div style="text-align: right; font-family: sans-serif;">
-                                <div style="font-size: 0.75rem; color: ${counterColor};">
-                                    ${phaseDone}/${p.lessons.length}
-                                </div>
-                            </div>
-                        </div>
-                        <div style="height: 3px; background-color: #1E1A12; border-radius: 2px; overflow: hidden;">
-                            <div style="height: 100%; width: ${progressPct}%; background-color: ${p.color}; border-radius: 2px; transition: width 0.5s;"></div>
-                        </div>
-                    </button>
-                `;
-            }).join('');
+// ── VIEWS ──
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
 
-            const habitsHtml = habits.map(h => `
-                <div style="background-color: #1A1612; border: 1px solid #2A2418; border-radius: 8px; padding: 0.85rem; display: flex; align-items: flex-start; gap: 0.75rem;">
-                    <span style="font-size: 1.2rem; flex-shrink: 0;">${h.icon}</span>
-                    <div>
-                        <div style="color: #E8D8C0; font-family: sans-serif; font-weight: 600; font-size: 0.9rem;">${h.title}</div>
-                        <div style="color: #6A5A42; font-family: sans-serif; font-size: 0.8rem; margin-top: 0.1rem; line-height: 1.5;">${h.desc}</div>
-                    </div>
-                </div>
-            `).join('');
+function switchTab(tab) {
+  activeTab = tab;
+  document.getElementById('tab-journey').classList.toggle('active', tab === 'journey');
+  document.getElementById('tab-reading').classList.toggle('active', tab === 'reading');
+  if (tab === 'journey') {
+    showHome();
+  } else {
+    renderReadingPlan();
+    showView('view-reading');
+  }
+}
 
-            return `
-                <div style="padding: 1.5rem;">
-                    <!-- Opening word -->
-                    <div style="background-color: #141008; border: 1px solid #2A2010; border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; text-align: center;">
-                        <p style="margin: 0; font-style: italic; color: #9A8A72; line-height: 1.7; font-family: sans-serif; font-size: 0.9rem;">
-                            "You do not need to know more about God as much as you need to <em>know</em> God — and to align your life with His Word. This journey is not a curriculum. It is a conversation with the living Christ."
-                        </p>
-                        <p style="margin: 0.75rem 0 0; color: #C8A96E; font-size: 0.8rem; font-family: sans-serif; letter-spacing: 0.1em;">— Your Pastor</p>
-                    </div>
+function showHome() {
+  currentPhaseId = null;
+  currentWeek = null;
+  renderHome();
+  showView('view-home');
+}
 
-                    <!-- Phases -->
-                    <h3 style="font-size: 0.8rem; letter-spacing: 0.2em; color: #5A4A32; font-family: sans-serif; text-transform: uppercase; margin-bottom: 0.75rem;">Your Four Phases</h3>
-                    <div style="display: grid; gap: 0.75rem; margin-bottom: 2rem;">
-                        ${phasesHtml}
-                    </div>
+function showPhase(phaseId) {
+  currentPhaseId = phaseId;
+  currentWeek = null;
+  renderPhase(phaseId);
+  showView('view-phase');
+}
 
-                    <!-- Daily habits -->
-                    <h3 style="font-size: 0.8rem; letter-spacing: 0.2em; color: #5A4A32; font-family: sans-serif; text-transform: uppercase; margin-bottom: 0.75rem;">Daily Habits of a Disciple</h3>
-                    <div style="display: grid; gap: 0.6rem; margin-bottom: 2rem;">
-                        ${habitsHtml}
-                    </div>
+function showLesson(phaseId, week) {
+  currentPhaseId = phaseId;
+  currentWeek = week;
+  renderLesson(phaseId, week);
+  document.getElementById('lesson-back-btn').onclick = () => showPhase(phaseId);
+  showView('view-lesson');
+}
 
-                    <div style="text-align: center; padding: 1rem 0; border-top: 1px solid #1E1A12;">
-                        <p style="margin: 0; color: #4A3A22; font-family: sans-serif; font-size: 0.8rem; line-height: 1.6;">
-                            "For the word of God is alive and active."<br />— Hebrews 4:12
-                        </p>
-                    </div>
-                </div>
-            `;
-        }
+// ── RENDER DAILY READING ──
+function renderReadingPlan() {
+  let dayCounter = 0;
+  const listEl = document.getElementById('reading-plan-list');
+  let html = '';
 
-        // --- MAIN RENDER CYCLE ---
-        function render() {
-            const app = document.getElementById('app');
-            
-            const totalLessons = phases.reduce((acc, p) => acc + p.lessons.length, 0);
-            const completedCount = Object.values(completed).filter(Boolean).length;
-            const progressPct = Math.round((completedCount / totalLessons) * 100);
+  readingStages.forEach(stage => {
+    html += `
+      <div class="stage-header">
+        <span class="stage-title">${stage.title}</span>
+        <span class="stage-range">${stage.range}</span>
+      </div>
+      <p class="stage-why">${stage.why}</p>`;
+    stage.days.forEach(reading => {
+      dayCounter++;
+      const key = `day-${dayCounter}`;
+      const done = !!readingDone[key];
+      html += `
+        <div class="day-row ${done ? 'done' : ''}" onclick="toggleReadingDay('${key}')">
+          <div class="day-check ${done ? 'checked' : ''}">${done ? '✓' : ''}</div>
+          <div class="day-reading">Day ${dayCounter} — ${reading}</div>
+        </div>`;
+    });
+  });
 
-            const phase = activePhase !== null ? phases.find((p) => p.id === activePhase) : null;
-            const lesson = phase && activeLesson !== null ? phase.lessons.find((l) => l.week === activeLesson) : null;
+  listEl.innerHTML = html;
+  updateReadingProgress();
+}
 
-            let html = `
-                <div style="min-height: 100vh;">
-                    <!-- Header -->
-                    <div style="background: linear-gradient(180deg, #1A1410 0%, #0F0D0A 100%); border-bottom: 1px solid #2A2418; padding: 2rem 1.5rem 1.5rem; text-align: center;">
-                        <div style="font-size: 1rem; letter-spacing: 0.25em; color: #C8A96E; margin-bottom: 0.5rem; font-family: sans-serif; text-transform: uppercase;">
-                            A 20-Week Learning Journey
-                        </div>
-                        <h1 style="font-size: 2.2rem; font-weight: 700; margin: 0 0 0.5rem; line-height: 1.2; color: #F0E8D8;">
-                            Building Faith &<br />Walking in Authority
-                        </h1>
-                        <p style="color: #8A7A62; font-size: 0.95rem; margin: 0.5rem 0 1.5rem; font-family: sans-serif;">
-                            Rooted in Christ · Grounded in Scripture · Called to Steward
-                        </p>
+function toggleReadingDay(key) {
+  readingDone[key] = !readingDone[key];
+  saveReadingDone();
+  renderReadingPlan();
+}
 
-                        <!-- Progress -->
-                        <div style="max-width: 320px; margin: 0 auto;">
-                            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #8A7A62; margin-bottom: 0.4rem; font-family: sans-serif;">
-                                <span>${completedCount} of ${totalLessons} lessons complete</span>
-                                <span>${progressPct}%</span>
-                            </div>
-                            <div style="height: 6px; background-color: #1E1A12; border-radius: 3px; overflow: hidden;">
-                                <div style="height: 100%; width: ${progressPct}%; background-color: #C8A96E; border-radius: 3px; transition: width 0.5s ease;"></div>
-                            </div>
-                        </div>
-                    </div>
-            `;
+function updateReadingProgress() {
+  const done = Object.values(readingDone).filter(Boolean).length;
+  document.getElementById('reading-progress-text').textContent = `${done} of ${totalReadingDays} days read`;
+}
 
-            if (lesson) {
-                html += renderLessonView(phase, lesson);
-            } else if (phase) {
-                html += renderPhaseView(phase);
-            } else {
-                html += renderHomeView();
-            }
+function resetReadingPlan() {
+  if (confirm('Reset all daily reading progress? This cannot be undone.')) {
+    readingDone = {};
+    saveReadingDone();
+    renderReadingPlan();
+  }
+}
 
-            html += `</div>`;
-            app.innerHTML = html;
-        }
+// ── RENDER HOME ──
+function renderHome() {
+  // Phases
+  const phaseList = document.getElementById('phase-list');
+  phaseList.innerHTML = phases.map(p => {
+    const done = p.lessons.filter(l => completed[`${p.id}-${l.week}`]).length;
+    const pct = Math.round((done / p.lessons.length) * 100);
+    return `
+      <button class="phase-card" onclick="showPhase(${p.id})" style="border-left-color:${p.color}">
+        <div class="phase-card-top">
+          <div>
+            <div class="phase-eyebrow" style="color:${p.color}">${p.duration}</div>
+            <div class="phase-title">${p.icon} ${p.title}</div>
+            <div class="phase-subtitle">${p.subtitle}</div>
+          </div>
+          <div class="phase-count" style="color:${done === p.lessons.length ? p.color : '#5A4A32'}">${done}/${p.lessons.length}</div>
+        </div>
+        <div class="phase-progress">
+          <div class="phase-progress-fill" style="width:${pct}%;background:${p.color}"></div>
+        </div>
+      </button>`;
+  }).join('');
 
-        // Initialize App
-        document.addEventListener('DOMContentLoaded', render);
-    </script>
+  // Habits
+  const habitList = document.getElementById('habit-list');
+  habitList.innerHTML = habits.map(h => `
+    <div class="habit-card">
+      <span class="habit-icon">${h.icon}</span>
+      <div>
+        <div class="habit-title">${h.title}</div>
+        <div class="habit-desc">${h.desc}</div>
+      </div>
+    </div>`).join('');
+
+  updateProgress();
+}
+
+// ── RENDER PHASE ──
+function renderPhase(phaseId) {
+  const p = phases.find(x => x.id === phaseId);
+  const content = document.getElementById('phase-detail-content');
+  const lessonCards = p.lessons.map(l => {
+    const done = completed[`${p.id}-${l.week}`];
+    return `
+      <button class="lesson-card" onclick="showLesson(${p.id}, ${l.week})"
+        style="border-color:${done ? p.color + '88' : '#2A2418'}">
+        <div class="lesson-num" style="background:${done ? p.color : '#2A2418'};color:${done ? '#0F0D0A' : '#6A5A42'}">
+          ${done ? '✓' : l.week}
+        </div>
+        <div>
+          <div class="lesson-name">${l.title}</div>
+          <div class="lesson-focus">${l.focus}</div>
+        </div>
+        <span class="lesson-arrow">›</span>
+      </button>`;
+  }).join('');
+
+  content.innerHTML = `
+    <div class="phase-detail-header">
+      <div class="phase-detail-icon-row">
+        <span class="phase-detail-icon">${p.icon}</span>
+        <div class="phase-detail-meta">
+          <div class="phase-detail-eyebrow" style="color:${p.color}">${p.duration} · ${p.theme}</div>
+          <div class="phase-detail-title">${p.title}</div>
+        </div>
+      </div>
+      <p class="phase-detail-desc">${p.description}</p>
+      <div class="scripture-block" style="border-left-color:${p.color}">
+        <p class="scripture-text">${p.scriptureText}</p>
+      </div>
+    </div>
+    <div class="section-label">Weekly Lessons</div>
+    ${lessonCards}`;
+}
+
+// ── RENDER LESSON ──
+function renderLesson(phaseId, week) {
+  const p = phases.find(x => x.id === phaseId);
+  const l = p.lessons.find(x => x.week === week);
+  const key = `${p.id}-${l.week}`;
+  const done = completed[key];
+
+  const readingItems = l.readings.map(r => `<li>${r}</li>`).join('');
+
+  document.getElementById('lesson-detail-content').innerHTML = `
+    <div class="lesson-detail-card" style="border:1px solid ${p.color}33">
+      <div class="lesson-eyebrow" style="color:${p.color}">Week ${l.week}</div>
+      <h2 class="lesson-title">${l.title}</h2>
+      <p class="lesson-subtitle">${l.focus}</p>
+
+      <div class="info-block">
+        <div class="info-block-label" style="color:${p.color}">📖 This Week's Readings</div>
+        <ul>${readingItems}</ul>
+      </div>
+
+      <div class="info-block">
+        <div class="info-block-label" style="color:${p.color}">✍️ Practice</div>
+        <p>${l.practice}</p>
+      </div>
+
+      <div class="info-block">
+        <div class="info-block-label" style="color:${p.color}">🙏 Prayer Focus</div>
+        <p class="italic">"${l.prayer}"</p>
+      </div>
+
+      <div class="key-verse-block" style="background:#12100E;border:1px solid ${p.color}">
+        <div class="key-verse-label" style="color:${p.color}">Key Verse</div>
+        <div class="key-verse-ref">${l.keyVerse}</div>
+      </div>
+
+      <button id="complete-btn" class="complete-btn"
+        onclick="toggleComplete('${key}')"
+        style="background:${done ? '#2A4A2A' : p.color};color:${done ? '#6BCC6B' : '#0F0D0A'}">
+        ${done ? '✓ Completed' : 'Mark Week Complete'}
+      </button>
+    </div>`;
+}
+
+// ── TOGGLE COMPLETE ──
+function toggleComplete(key) {
+  completed[key] = !completed[key];
+  saveCompleted();
+  updateProgress();
+  // Re-render lesson so button updates
+  renderLesson(currentPhaseId, currentWeek);
+}
+
+// ── INIT ──
+renderHome();
+</script>
 </body>
 </html>
